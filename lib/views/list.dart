@@ -8,7 +8,6 @@ import '../store/event.dart';
 import '../store/state.dart';
 
 class RunList extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
@@ -78,15 +77,8 @@ class RunList extends StatelessWidget {
 
   Future<void> onRefresh(BuildContext context) async {
     final bloc = BlocProvider.of<RunBloc>(context);
-    // TODO: listen to the refreshing end.
     bloc.dispatch(RefreshRuns());
-    await Future.doWhile(() async {
-      await Future.delayed(Duration(milliseconds: 100));
-      return bloc.currentState is! RunsRefreshing;
-    });
-    await Future.doWhile(() async {
-      await Future.delayed(Duration(milliseconds: 100));
-      return bloc.currentState is RunsRefreshing;
-    });
+    await bloc.state.firstWhere((state) => state is RunsRefreshing);
+    await bloc.state.firstWhere((state) => state is! RunsRefreshing);
   }
 }
