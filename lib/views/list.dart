@@ -20,20 +20,17 @@ class RunList extends StatelessWidget {
           onNotification: onOverscrollNotification,
           child: RefreshIndicator(
             child: ListView.builder(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(8.0),
               physics: const ClampingScrollPhysics(),
               itemCount: list.length + 1,
               itemBuilder: (BuildContext context, int index) {
                 if (index < list.length) {
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: RunItem(list[index])
-                  );
-                }
-                if (state is RunsError) {
+                  return RunItem(list[index]);
+                } else if (state is RunsError) {
                   return getErrorFooter(context);
+                } else {
+                  return getLoadingFooter();
                 }
-                return getLoadingFooter();
               },
             ),
             onRefresh: () => onRefresh(context),
@@ -53,7 +50,7 @@ class RunList extends StatelessWidget {
   Widget getErrorFooter(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Center(
         child: IconButton(
           icon: const Icon(Icons.error),
