@@ -27,7 +27,7 @@ class _Content extends StatelessWidget {
                   width: 64,
                   height: 64 / run.cover.size.width * run.cover.size.height,
                 ) : null,
-              SizedBox(width: 8.0),
+              const SizedBox(width: 8.0),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,18 +35,18 @@ class _Content extends StatelessWidget {
                     run.game != null ? Text(run.game, maxLines: 1, style: textTheme.title) : null,
                     run.level != null ? Text(run.level, maxLines: 1, style: textTheme.subtitle) : null,
                     run.category != null ? Text(run.category, maxLines: 1, style: textTheme.subtitle) : null,
-                  ].whereType<Widget>().toList(growable: false),
+                  ].whereType<Widget>().toList(),
                 ),
               ),
-            ].whereType<Widget>().toList(growable: false),
+            ].whereType<Widget>().toList(),
           ),
         ),
-        run.comment != null ? Divider(height: 0) : null,
+        run.comment != null ? const Divider(height: 0) : null,
         run.comment != null ? Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(run.comment, style: textTheme.body1),
         ) : null,
-      ].whereType<Widget>().toList(growable: false),
+      ].whereType<Widget>().toList(),
     );
   }
 }

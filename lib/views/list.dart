@@ -7,25 +7,12 @@ import '../store/bloc.dart';
 import '../store/event.dart';
 import '../store/state.dart';
 
-class RunList extends StatefulWidget {
-
-  @override
-  State<StatefulWidget> createState() => _RunListState();
-}
-
-class _RunListState extends State<RunList> {
-  RunBloc _bloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _bloc = BlocProvider.of(context);
-  }
+class RunList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-      bloc: _bloc,
+      bloc: BlocProvider.of<RunBloc>(context),
       builder: (BuildContext context, RunState state) {
         final list = state.list;
 
@@ -44,12 +31,12 @@ class _RunListState extends State<RunList> {
                   );
                 }
                 if (state is RunsError) {
-                  return getErrorFooter();
+                  return getErrorFooter(context);
                 }
                 return getLoadingFooter();
               },
             ),
-            onRefresh: onRefresh,
+            onRefresh: () => onRefresh(context),
           ),
         );
       },
@@ -57,49 +44,52 @@ class _RunListState extends State<RunList> {
   }
 
   Widget getLoadingFooter() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.0),
       child: Center(child: CircularProgressIndicator())
     );
   }
 
-  Widget getErrorFooter() {
+  Widget getErrorFooter(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Center(
+      child: Center(
         child: IconButton(
-          icon: Icon(Icons.error),
+          icon: const Icon(Icons.error),
           color: theme.errorColor,
-          onPressed: onErrorButtonPressed,
+          onPressed: () => onErrorButtonPressed(context),
         ),
       ),
     );
   }
 
-  void onErrorButtonPressed() {
-    _bloc.dispatch(RetryRuns());
+  void onErrorButtonPressed(BuildContext context) {
+    final bloc = BlocProvider.of<RunBloc>(context);
+    bloc.dispatch(RetryRuns());
   }
 
   bool onOverscrollNotification(OverscrollNotification notification) {
-    if (_bloc.currentState is RunsLoaded) {
+    final bloc = BlocProvider.of<RunBloc>(notification.context);
+    if (bloc.currentState is RunsLoaded) {
       if (notification.overscroll > 0) {
-        _bloc.dispatch(MoreRuns());
+        bloc.dispatch(MoreRuns());
       }
     }
     return null;
   }
 
-  Future<void> onRefresh() async {
+  Future<void> onRefresh(BuildContext context) async {
+    final bloc = BlocProvider.of<RunBloc>(context);
     // TODO: listen to the refreshing end.
-    _bloc.dispatch(RefreshRuns());
+    bloc.dispatch(RefreshRuns());
     await Future.doWhile(() async {
       await Future.delayed(Duration(milliseconds: 100));
-      return _bloc.currentState is! RunsRefreshing;
+      return bloc.currentState is! RunsRefreshing;
     });
     await Future.doWhile(() async {
       await Future.delayed(Duration(milliseconds: 100));
-      return _bloc.currentState is RunsRefreshing;
+      return bloc.currentState is RunsRefreshing;
     });
   }
 }
