@@ -79,7 +79,7 @@ class RunItem extends StatelessWidget {
     );
     if (run.comment != null) content.children.addAll([
       const Divider(height: 20),
-      Text(run.comment, style: textTheme.body1),
+      Text(run.comment, maxLines: 3, overflow: TextOverflow.ellipsis, style: textTheme.body1),
     ]);
 
     return Stack(
