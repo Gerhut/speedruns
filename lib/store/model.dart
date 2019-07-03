@@ -38,7 +38,7 @@ class RunModel {
           ? json['game']['data'] : null;
     final Map<String, dynamic> coverJson =
       gameJson != null ?
-        gameJson['assets']['cover-small'] : null;
+        gameJson['assets']['cover-large'] : null;
     final Map<String, dynamic> levelJson =
       json['level'] is Map<String, dynamic> &&
         json['level']['data'] is Map<String, dynamic>

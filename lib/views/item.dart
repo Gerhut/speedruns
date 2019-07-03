@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:speedruns/store/model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,6 +15,7 @@ class RunItem extends StatelessWidget {
     return Card(
       margin: EdgeInsets.all(8.0),
       elevation: 4.0,
+      clipBehavior: Clip.antiAlias,
       child: getContent(context)
     );
   }
@@ -53,59 +55,47 @@ class RunItem extends StatelessWidget {
 
   Widget getBody(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              run.cover != null ?
-                Image.network(
-                  run.cover.uri.toString(),
-                  width: 64,
-                  height: 64 / run.cover.size.width * run.cover.size.height,
-                ) : null,
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    run.game != null
-                      ? Text(
-                        run.game,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.title
-                      ) : null,
-                    run.level != null
-                      ? Text(
-                        run.level,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.subtitle
-                      ) : null,
-                    run.category != null
-                      ? Text(
-                        run.category,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.subtitle
-                      ) : null,
-                  ].whereType<Widget>().toList(),
-                ),
-              ),
-            ].whereType<Widget>().toList(),
-          ),
+    final cover = run.cover != null ?
+      AspectRatio(
+        aspectRatio: run.cover.size.aspectRatio,
+        child: Ink.image(
+          image: NetworkImage(run.cover.uri.toString()),
+          fit: BoxFit.fill,
+          child: Container(),
         ),
-        run.comment != null ? const Divider(height: 0) : null,
-        run.comment != null ? Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(run.comment, style: textTheme.body1),
-        ) : null,
-      ].whereType<Widget>().toList(),
+      ): null;
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[],
+    );
+    if (run.game != null) content.children.add(
+      Text(run.game, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.title)
+    );
+    if (run.level != null) content.children.add(
+      Text(run.level, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.subtitle)
+    );
+    if (run.category != null) content.children.add(
+      Text(run.category, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.subtitle)
+    );
+    if (run.comment != null) content.children.addAll([
+      const Divider(height: 20),
+      Text(run.comment, style: textTheme.body1),
+    ]);
+
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: <Widget>[
+        ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: double.infinity),
+          child: cover,
+        ),
+        Container(
+          color: Colors.white70,
+          padding: EdgeInsets.all(10.0),
+          width: double.infinity,
+          child: content
+        ),
+      ],
     );
   }
 }
