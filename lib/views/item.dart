@@ -5,6 +5,18 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../store/model.dart';
 
+class _SingleLinedText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+
+  _SingleLinedText(this.text, { Key key, this.style }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
+  }
+}
+
 class RunItem extends StatelessWidget {
   RunItem(this.run, { Key key }) : super(key: key);
 
@@ -54,48 +66,62 @@ class RunItem extends StatelessWidget {
   }
 
   Widget getBody(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final cover = run.cover != null ?
-      AspectRatio(
+    final theme = Theme.of(context);
+    final content = Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[],
+    );
+    if (run.game != null) {
+      content.children.add(
+        _SingleLinedText(run.game, style: theme.textTheme.title)
+      );
+    };
+    if (run.level != null) {
+      content.children.add(
+        _SingleLinedText(run.level, style: theme.textTheme.subtitle)
+      );
+    }
+    if (run.category != null) {
+      content.children.add(
+        _SingleLinedText(run.category, style: theme.textTheme.subtitle)
+      );
+    }
+    if (run.comment != null) {
+      content.children.addAll([
+        const Divider(height: 20),
+        Text(run.comment, maxLines: 3, overflow: TextOverflow.ellipsis, style: theme.textTheme.body1),
+      ]);
+    }
+
+    final paddedContent = Padding(
+      padding: EdgeInsets.all(10.0),
+      child: content,
+    );
+
+    if (run.cover != null) {
+      return AspectRatio(
         aspectRatio: run.cover.size.aspectRatio,
         child: Ink.image(
           image: NetworkImage(run.cover.uri.toString()),
           fit: BoxFit.fill,
-          child: Container(),
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  theme.cardColor.withAlpha(0),
+                  theme.cardColor,
+                ]
+              ),
+            ),
+            child: paddedContent,
+          ),
         ),
-      ): null;
-    final content = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[],
-    );
-    if (run.game != null) content.children.add(
-      Text(run.game, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.title)
-    );
-    if (run.level != null) content.children.add(
-      Text(run.level, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.subtitle)
-    );
-    if (run.category != null) content.children.add(
-      Text(run.category, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.subtitle)
-    );
-    if (run.comment != null) content.children.addAll([
-      const Divider(height: 20),
-      Text(run.comment, maxLines: 3, overflow: TextOverflow.ellipsis, style: textTheme.body1),
-    ]);
-
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      children: <Widget>[
-        ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: double.infinity),
-          child: cover,
-        ),
-        Container(
-          color: Colors.white70,
-          padding: EdgeInsets.all(10.0),
-          width: double.infinity,
-          child: content
-        ),
-      ],
-    );
+      );
+    } else {
+      return paddedContent;
+    }
   }
 }
