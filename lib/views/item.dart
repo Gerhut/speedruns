@@ -5,15 +5,16 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../store/model.dart';
 
-class _SingleLinedText extends StatelessWidget {
+class _MaxLinesText extends StatelessWidget {
   final String text;
+  final int maxLines;
   final TextStyle style;
 
-  _SingleLinedText(this.text, { Key key, this.style }) : super(key: key);
+  _MaxLinesText(this.text, { Key key, this.maxLines = 1, this.style }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
+    return Text(text, maxLines: maxLines, overflow: TextOverflow.ellipsis, style: style);
   }
 }
 
@@ -70,29 +71,14 @@ class RunItem extends StatelessWidget {
     final content = Column(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[],
+      children: <Widget>[
+        run.game != null ? _MaxLinesText(run.game, style: theme.textTheme.title) : null,
+        run.level != null ? _MaxLinesText(run.level, style: theme.textTheme.subtitle) : null,
+        run.category != null ? _MaxLinesText(run.category, style: theme.textTheme.subtitle) : null,
+        run.comment != null ? const Divider(height: 20) : null,
+        run.comment != null ? _MaxLinesText(run.comment, maxLines: 3, style: theme.textTheme.body1) : null,
+      ].whereType<Widget>().toList(),
     );
-    if (run.game != null) {
-      content.children.add(
-        _SingleLinedText(run.game, style: theme.textTheme.title)
-      );
-    };
-    if (run.level != null) {
-      content.children.add(
-        _SingleLinedText(run.level, style: theme.textTheme.subtitle)
-      );
-    }
-    if (run.category != null) {
-      content.children.add(
-        _SingleLinedText(run.category, style: theme.textTheme.subtitle)
-      );
-    }
-    if (run.comment != null) {
-      content.children.addAll([
-        const Divider(height: 20),
-        Text(run.comment, maxLines: 3, overflow: TextOverflow.ellipsis, style: theme.textTheme.body1),
-      ]);
-    }
 
     final paddedContent = Padding(
       padding: EdgeInsets.all(10.0),

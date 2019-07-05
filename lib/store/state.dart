@@ -1,28 +1,27 @@
 import 'model.dart';
 
-abstract class RunState {
-  final List<RunModel> list;
-  const RunState(this.list);
+class RunState {
+  final List<RunModel> runs;
+  final int offset;
+  final bool loading;
+  final Exception exception;
 
-  int get length => list.length;
-}
+  RunState({
+    Iterable<RunModel> runs = const Iterable.empty(),
+    this.offset = 0,
+    this.loading = false,
+    this.exception,
+  }) : this.runs = List.unmodifiable(Set.of(runs));
 
-class RunsEmpty extends RunState {
-  const RunsEmpty() : super(const []);
-}
-
-class RunsLoading extends RunState {
-  RunsLoading(List<RunModel> list) : super(list);
-}
-
-class RunsLoaded extends RunState {
-  RunsLoaded(List<RunModel> list) : super(list);
-}
-
-class RunsError extends RunState {
-  RunsError(List<RunModel> list) : super(list);
-}
-
-class RunsRefreshing extends RunState {
-  RunsRefreshing(List<RunModel> list) : super(list);
+  RunState copyWith({
+    Iterable<RunModel> runs,
+    int offset,
+    bool loading,
+    Exception exception,
+  }) => RunState(
+    runs: runs ?? this.runs,
+    offset: offset ?? this.offset,
+    loading: loading ?? this.loading,
+    exception: exception,
+  );
 }

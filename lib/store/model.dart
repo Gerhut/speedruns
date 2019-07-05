@@ -1,6 +1,8 @@
 import 'dart:ui';
 
-class CoverModel {
+import 'package:equatable/equatable.dart';
+
+class CoverModel extends Equatable {
   final Uri uri;
   final Size size;
 
@@ -9,10 +11,11 @@ class CoverModel {
     double width,
     double height,
   }) : this.uri = Uri.parse(uri),
-    this.size = Size(width, height);
+    this.size = Size(width, height),
+    super([uri]);
 }
 
-class RunModel {
+class RunModel extends Equatable {
   final String id;
   final CoverModel cover;
   final String game;
@@ -29,7 +32,7 @@ class RunModel {
     this.category,
     this.comment,
     this.videos,
-  });
+  }) : super([id]);
 
   factory RunModel.fromJson(final Map<String, dynamic> json) {
     final Map<String, dynamic> gameJson =

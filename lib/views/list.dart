@@ -13,7 +13,7 @@ class RunList extends StatelessWidget {
     return BlocBuilder(
       bloc: BlocProvider.of<RunBloc>(context),
       builder: (BuildContext context, RunState state) {
-        final list = state.list;
+        final runs = state.runs;
 
         return NotificationListener<OverscrollNotification>(
           onNotification: onOverscrollNotification,
@@ -21,11 +21,12 @@ class RunList extends StatelessWidget {
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),
               physics: const ClampingScrollPhysics(),
-              itemCount: list.length + 1,
+              itemCount: runs.length + 1,
               itemBuilder: (BuildContext context, int index) {
-                if (index < list.length) {
-                  return RunItem(list[index]);
-                } else if (state is RunsError) {
+                if (index < runs.length) {
+                  return RunItem(runs[index], key: ValueKey(runs[index].id));
+                }
+                if (state.exception != null) {
                   return getErrorFooter(context);
                 } else {
                   return getLoadingFooter();
@@ -67,7 +68,7 @@ class RunList extends StatelessWidget {
 
   bool onOverscrollNotification(OverscrollNotification notification) {
     final bloc = BlocProvider.of<RunBloc>(notification.context);
-    if (bloc.currentState is RunsLoaded) {
+    if (!bloc.currentState.loading) {
       if (notification.overscroll > 0) {
         bloc.dispatch(MoreRuns());
       }
@@ -78,7 +79,7 @@ class RunList extends StatelessWidget {
   Future<void> onRefresh(BuildContext context) async {
     final bloc = BlocProvider.of<RunBloc>(context);
     bloc.dispatch(RefreshRuns());
-    await bloc.state.firstWhere((state) => state is RunsRefreshing);
-    await bloc.state.firstWhere((state) => state is! RunsRefreshing);
+    await bloc.state.firstWhere((state) => state.loading);
+    await bloc.state.firstWhere((state) => !state.loading);
   }
 }

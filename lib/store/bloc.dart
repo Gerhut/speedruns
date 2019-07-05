@@ -9,30 +9,40 @@ class RunBloc extends Bloc<RunEvent, RunState> {
   RunBloc() : client = RunClient();
 
   @override
-  get initialState => RunsEmpty();
+  get initialState => RunState();
 
   @override
   Stream<RunState> mapEventToState(RunEvent event) async* {
     try {
       if (event is MoreRuns || event is RetryRuns) {
-        final loadingState = RunsLoading(currentState.list);
-        yield loadingState;
-        final runs = await client.fetch(offset: currentState.length);
-        if (currentState == loadingState) { dispatch(AppendRuns(runs)); }
-      } else if (event is RefreshRuns) {
-        final refreshingState = RunsRefreshing(currentState.list);
-        yield refreshingState;
-        final runs = await client.fetch();
-        if (currentState == refreshingState) { dispatch(SetRuns(runs)); }
-      } else if (event is SetRuns) {
-        yield RunsLoaded(event.runs);
-      } else if (event is AppendRuns) {
-        yield RunsLoaded(currentState.list.followedBy(event.runs).toList());
+        final nextState = currentState.copyWith(loading: true);
+        yield nextState;
+        final runs = await client.fetch(offset: currentState.offset);
+        if (nextState != currentState) return;
+        yield currentState.copyWith(
+          runs: currentState.runs.followedBy(runs),
+          offset: currentState.offset + runs.length,
+          loading: false,
+        );
       }
-    } catch (error) {
-      print(error.message);
-      print(error.stackTrace);
-      yield RunsError(currentState.list);
+
+      if (event is RefreshRuns) {
+        final nextState = currentState.copyWith(loading: true);
+        yield nextState;
+        final runs = await client.fetch();
+        if (nextState != currentState) return;
+        yield currentState.copyWith(
+          runs: runs,
+          offset: runs.length,
+          loading: false,
+        );
+      }
+    } on Exception catch (exception) {
+      print(exception);
+      yield currentState.copyWith(
+        loading: false,
+        exception: exception
+      );
     }
   }
 }
