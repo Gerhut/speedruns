@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'list.dart';
+import 'card.dart';
 
 class App extends StatelessWidget {
 
@@ -9,8 +9,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Speedruns',
       home: Scaffold(
-        appBar: AppBar(title: Text('Speedruns')),
-        body: RunList(),
+        body: RunCard(),
       ),
     );
   }

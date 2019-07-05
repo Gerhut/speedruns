@@ -27,7 +27,7 @@ class RunItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(8.0),
-      elevation: 4.0,
+      elevation: 2.0,
       clipBehavior: Clip.antiAlias,
       child: getContent(context)
     );

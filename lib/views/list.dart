@@ -24,41 +24,37 @@ class RunList extends StatelessWidget {
               itemCount: runs.length + 1,
               itemBuilder: (BuildContext context, int index) {
                 if (index < runs.length) {
-                  return RunItem(runs[index], key: ValueKey(runs[index].id));
-                }
-                if (state.exception != null) {
-                  return getErrorFooter(context);
+                  return RunItem(runs[index], key: ValueKey(runs[index]));
                 } else {
-                  return getLoadingFooter();
+                  return getFooter(context, state);
                 }
               },
             ),
             onRefresh: () => onRefresh(context),
           ),
         );
-      },
+      }
     );
   }
 
-  Widget getLoadingFooter() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.0),
-      child: Center(child: CircularProgressIndicator())
-    );
-  }
-
-  Widget getErrorFooter(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
+  Widget getFooter(BuildContext context, RunState state) {
+    if (state.exception != null) {
+      final theme = Theme.of(context);return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Center(
-        child: IconButton(
-          icon: const Icon(Icons.error),
-          color: theme.errorColor,
-          onPressed: () => onErrorButtonPressed(context),
+        child: Center(
+          child: IconButton(
+            icon: const Icon(Icons.error),
+            color: theme.errorColor,
+            onPressed: () => onErrorButtonPressed(context),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
   }
 
   void onErrorButtonPressed(BuildContext context) {
